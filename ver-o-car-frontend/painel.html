@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque - Concessionária</title>
+</head>
+<body>
+
+    <header>
+        <h1>Gestão de Estoque</h1>
+        <button id="btn-logout">Sair do Sistema</button>
+    </header>
+
+    <main>
+        <h2>Cadastrar Novo Veículo</h2>
+        
+        <!-- Formulário de Cadastro -->
+        <form id="form-cadastro-carro">
+            <input type="text" id="input-marca" placeholder="Marca (ex: Toyota)" required>
+            <input type="text" id="input-modelo" placeholder="Modelo (ex: Corolla)" required>
+            <input type="number" id="input-ano" placeholder="Ano (ex: 2024)" required>
+            <input type="text" id="input-chassi" placeholder="Chassi (17 caracteres)" required maxlength="17">
+            <input type="number" id="input-preco" placeholder="Preço (R$)" step="0.01" required>
+            
+            <button type="submit">Salvar no Estoque</button>
+        </form>
+
+        <hr>
+
+        <h2>Veículos Disponíveis</h2>
+        <div id="lista-veiculos">
+            <p>Carregando dados do servidor...</p>
+        </div>
+    </main>
+
+    <script src="./js/painel.js"></script>
+</body>
+</html>

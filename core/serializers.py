@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Veiculo, Usuario
+from django.contrib.auth.models import User
+from .models import Veiculo
 
 # Serializadores para os modelos Veiculo e Usuario, incluindo validação para o preço do veículo e criação de usuário com senha hashada.
 class VeiculoSerializer(serializers.ModelSerializer):
@@ -12,12 +13,12 @@ class VeiculoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("O preço do veículo não pode ser negativo.")
         return value
 
-class UsuarioSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Usuario
+        model = User
         fields = ['id', 'username', 'email', 'password', 'is_staff']
         extra_kwargs = {'password': {'write_only': True}}
 
     #Criação de usuário utilizando o método create_user para garantir que a senha seja corretamente hashada
     def create(self, validated_data):
-        return Usuario.objects.create_user(**validated_data)
+        return User.objects.create_user(**validated_data)
