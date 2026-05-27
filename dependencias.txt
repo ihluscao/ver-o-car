@@ -1,0 +1,20 @@
+# Core do Framework
+Django>=4.2,<5.0
+
+# API e Serialização
+djangorestframework>=3.14.0
+
+# Autenticação (JWT)
+djangorestframework-simplejwt>=5.3.0
+
+# Segurança e CORS (Permite o Front-end falar com o Back-end)
+django-cors-headers>=4.3.0
+
+# Banco de Dados (MySQL)
+mysqlclient>=2.2.0
+
+# Processamento de Imagens (Upload de fotos)
+Pillow>=10.2.0
+
+# Documentação Automática (Swagger)
+drf-spectacular>=0.27.0

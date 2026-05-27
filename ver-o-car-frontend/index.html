@@ -3,31 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Concessionária</title>
+    <title>Login - Ver-o-Car Backoffice</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    
 </head>
 <body>
-
-    <main>
-        <h1>Acesso ao Sistema</h1>
+    <main class="container">
         
-        <form id="login-form">
-            <div>
-                <label for="username">Usuário (Matrícula):</label>
-                <input type="text" id="username" required>
-            </div>
-            
-            <br>
-            
-            <div>
-                <label for="password">Senha:</label>
+        <article>
+            <header>
+                <h2>Área Restrita</h2>
+                <p>Ver-o-Car - Gestão de Estoque</p>
+            </header>
 
-                <input type="password" id="password" required>
-            </div>
+            <form id="login-form">
+                <label for="username">
+                    Matrícula:
+                    <input type="text" id="username" placeholder="Digite seu usuário" required>
+                </label>
+                
+                <label for="password">
+                    Senha:
+                    <input type="password" id="password" placeholder="Sua senha secreta" required>
+                </label>
 
-            <br>
-            
-            <button type="submit">Entrar</button>
-        </form>
+                <button type="submit">Acessar Sistema</button>
+            </form>
+        </article>
+
     </main>
 
     <script src="./js/login.js"></script>

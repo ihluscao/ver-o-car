@@ -4,7 +4,6 @@ document.getElementById('btn-logout').addEventListener('click', fazerLogout);
 
 async function listarCarros() {
     const token = localStorage.getItem('accessToken');
-
     if (!token) {
         window.location.href = "index.html";
         return;
@@ -19,44 +18,71 @@ async function listarCarros() {
             }
         });
 
+        // 🟢 Removemos a mensagem de loading quando a API responde
+        const loadingMsg = document.getElementById('mensagem-carregamento-painel');
+        if (loadingMsg) loadingMsg.style.display = 'none';
+
         if (response.ok) {
-            const carros = await response.json();
+            const carros = await response.json(); 
             renderizarCarrosNaTela(carros);
         } else if (response.status === 401) {
             alert("Sua sessão expirou. Faça login novamente.");
             fazerLogout();
         } else {
-            console.error("Erro ao buscar estoque.");
+            document.getElementById('lista-veiculos').innerHTML = "<p>Erro ao buscar estoque.</p>";
         }
     } catch (error) {
-        document.getElementById('lista-veiculos').innerHTML = "<p>Erro de conexão com o servidor.</p>";
+        document.getElementById('lista-veiculos').innerHTML = "<p>Erro de rede.</p>";
     }
 }
 
+// 🟢 Nova função de renderização focada em Tabelas (estilo Backoffice)
 function renderizarCarrosNaTela(listaDeCarros) {
     const container = document.getElementById('lista-veiculos');
 
     if (listaDeCarros.length === 0) {
-        container.innerHTML = "<p>Nenhum veículo cadastrado no estoque.</p>";
+        container.innerHTML = "<p>O estoque está vazio. Comece a cadastrar.</p>";
         return;
     }
 
-    let htmlGerado = "<ul>";
+    // Estrutura clássica de tabela HTML (o Pico.css cuida das bordas listradas)
+    let htmlGerado = `
+        <table class="striped">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Veículo</th>
+                    <th scope="col">Ano</th>
+                    <th scope="col">Chassi</th>
+                    <th scope="col">Preço</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
     
     listaDeCarros.forEach(carro => {
+        // Usa a tag <mark> do Pico para destacar visualmente os carros VENDIDOS
+        let statusBadge = carro.status === 'VENDIDO' 
+            ? `<mark style="background-color: #d81b60; color: white;">VENDIDO</mark>` 
+            : `<mark style="background-color: #4caf50; color: white;">DISPONÍVEL</mark>`;
+
         htmlGerado += `
-            <li>
-                <strong>${carro.marca} ${carro.modelo}</strong> (${carro.ano}) 
-                - Chassi: ${carro.chassi} 
-                - R$ ${carro.preco} 
-                - Status: <em>${carro.status}</em>
-            </li>
-            <hr>
+            <tr>
+                <th scope="row">${carro.id}</th>
+                <td><strong>${carro.marca}</strong> ${carro.modelo}</td>
+                <td>${carro.ano}</td>
+                <td><code>${carro.chassi}</code></td>
+                <td>R$ ${carro.preco}</td>
+                <td>${statusBadge}</td>
+            </tr>
         `;
     });
 
-    htmlGerado += "</ul>";
-
+    htmlGerado += `
+            </tbody>
+        </table>
+    `;
 
     container.innerHTML = htmlGerado;
 }
@@ -66,59 +92,54 @@ function fazerLogout() {
     localStorage.removeItem('accessToken'); 
     window.location.href = "index.html";    
 }
-// js/painel.js (Continuação)
+// js/painel.js
 
-// 1. O Gatilho do Formulário
+// O Gatilho do Formulário de Cadastro
 document.getElementById('form-cadastro-carro').addEventListener('submit', async function(event) {
-    // Impede a página de recarregar
     event.preventDefault();
 
-    // 2. Monta o objeto JSON lendo os IDs do HTML
-    const novoVeiculo = {
-        marca: document.getElementById('input-marca').value,
-        modelo: document.getElementById('input-modelo').value,
-        ano: parseInt(document.getElementById('input-ano').value),
-        chassi: document.getElementById('input-chassi').value,
-        preco: parseFloat(document.getElementById('input-preco').value),
-        status: "DISPONIVEL" // Definimos um padrão inicial
-    };
+    // 1. Usamos FormData em vez de JSON para suportar o envio de arquivos
+    const formData = new FormData();
+    
+    // 2. Anexamos os campos de texto no pacote
+    formData.append('marca', document.getElementById('input-marca').value);
+    formData.append('modelo', document.getElementById('input-modelo').value);
+    formData.append('ano', parseInt(document.getElementById('input-ano').value));
+    formData.append('chassi', document.getElementById('input-chassi').value);
+    formData.append('preco', parseFloat(document.getElementById('input-preco').value));
+    formData.append('status', "DISPONIVEL");
 
-    // 3. Resgata o token de autorização
+    // 3. Capturamos o arquivo da imagem (se o usuário tiver selecionado um)
+    const campoImagem = document.getElementById('input-imagem');
+    if (campoImagem.files.length > 0) {
+        // Anexa o arquivo físico no pacote. O nome 'imagem' deve bater com o models.py
+        formData.append('imagem', campoImagem.files[0]);
+    }
+
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
     try {
-        // 4. Dispara o POST para o Django
         const response = await fetch('http://localhost:8000/api/veiculos/', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                // 🟢 ATENÇÃO ARQUITETO: NUNCA defina 'Content-Type': 'application/json' 
+                // quando usar FormData. O navegador ajusta isso automaticamente para 
+                // 'multipart/form-data' e insere as chaves (boundaries) corretas.
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(novoVeiculo)
+            body: formData // Envia o pacote misto (texto + arquivo)
         });
 
-        // 5. Analisa a Resposta
         if (response.ok) {
             alert("Veículo cadastrado com sucesso!");
-            
-            // Limpa o formulário na tela
             document.getElementById('form-cadastro-carro').reset();
-            
-            // Re-lista os carros para que o novo apareça imediatamente
             listarCarros(); 
         } else {
-            // Se caiu aqui, o Middleware do Django ou o Serializer bloqueou a ação
             const erroData = await response.json();
-            
-            // Tenta mostrar a mensagem exata do erro
-            if (erroData.erro) {
-                alert(`Recusado pelo Servidor: ${erroData.erro}`);
-            } else {
-                alert(`Erro de Validação: ${JSON.stringify(erroData)}`);
-            }
+            alert(`Erro de Validação: ${JSON.stringify(erroData)}`);
         }
     } catch (error) {
-        alert("Erro ao conectar com o banco de dados.");
+        alert("Erro ao enviar a imagem para o servidor.");
     }
 });

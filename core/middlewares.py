@@ -16,11 +16,18 @@ class RequestLoggerMiddleware:
         return response
 
 #segunda camada de middleware, para autenticação básica.
+# core/middlewares.py
+
 class CustomAuthMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
+        # 1. Se for uma requisição apenas para LER dados, deixa passar!
+        if request.method == 'GET':
+            return self.get_response(request)
+
+        # 2. Se for POST, PUT ou DELETE, a regra antiga continua valendo:
         if request.path.startswith('/api/') and 'token' not in request.path:
             auth_header = request.headers.get('Authorization')
             if not auth_header:
@@ -28,6 +35,7 @@ class CustomAuthMiddleware:
                     {'erro': 'Cabeçalho de Autorização ausente. Acesso negado pelo Middleware.'}, 
                     status=401
                 )
+                
         return self.get_response(request)
 
 #terceira camada de middleware, para validar o corpo das requisições POST/PUT.

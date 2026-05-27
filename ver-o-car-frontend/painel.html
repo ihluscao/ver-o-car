@@ -3,35 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estoque - Concessionária</title>
+    <title>Estoque - Ver-o-Car Backoffice</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 </head>
 <body>
 
-    <header>
-        <h1>Gestão de Estoque</h1>
-        <button id="btn-logout">Sair do Sistema</button>
-    </header>
-
-    <main>
-        <h2>Cadastrar Novo Veículo</h2>
+    <main class="container">
         
-        <!-- Formulário de Cadastro -->
-        <form id="form-cadastro-carro">
-            <input type="text" id="input-marca" placeholder="Marca (ex: Toyota)" required>
-            <input type="text" id="input-modelo" placeholder="Modelo (ex: Corolla)" required>
-            <input type="number" id="input-ano" placeholder="Ano (ex: 2024)" required>
-            <input type="text" id="input-chassi" placeholder="Chassi (17 caracteres)" required maxlength="17">
-            <input type="number" id="input-preco" placeholder="Preço (R$)" step="0.01" required>
-            
-            <button type="submit">Salvar no Estoque</button>
-        </form>
+        <nav>
+            <ul>
+                <li><strong>🛠️ Ver-o-Car Admin</strong></li>
+            </ul>
+            <ul>
+                <li><button class="secondary outline" id="btn-logout">Sair do Sistema</button></li>
+            </ul>
+        </nav>
 
         <hr>
 
-        <h2>Veículos Disponíveis</h2>
-        <div id="lista-veiculos">
-            <p>Carregando dados do servidor...</p>
-        </div>
+        <section id="cadastro">
+            <h2>Cadastrar Novo Veículo</h2>
+            <article>
+                <form id="form-cadastro-carro">
+                    <div class="grid">
+                        <label for="input-marca">
+                            Marca
+                            <input type="text" id="input-marca" placeholder="ex: Toyota" required>
+                        </label>
+                        <label for="input-modelo">
+                            Modelo
+                            <input type="text" id="input-modelo" placeholder="ex: Corolla" required>
+                        </label>
+                        <label for="input-ano">
+                            Ano
+                            <input type="number" id="input-ano" placeholder="ex: 2024" required>
+                        </label>
+                    </div>
+
+                    <div class="grid">
+                        <label for="input-chassi">
+                            Chassi
+                            <input type="text" id="input-chassi" placeholder="17 caracteres" required maxlength="17">
+                        </label>
+                        <label for="input-preco">
+                            Preço (R$)
+                            <input type="number" id="input-preco" step="0.01" required>
+                        </label>
+                    </div>
+
+                    <label for="input-imagem">
+                        Foto do Veículo (Opcional)
+                        <input type="file" id="input-imagem" accept="image/*"> 
+                    </label>
+                    
+                    <button type="submit">Salvar no Estoque</button>
+                </form>
+            </article>
+        </section>
+
+        <section id="estoque" style="margin-top: 2rem;">
+            <h2>Veículos Disponíveis</h2>
+            <div id="lista-veiculos">
+                <p id="mensagem-carregamento-painel" aria-busy="true">Carregando dados do servidor...</p>
+            </div>
+        </section>
+        
     </main>
 
     <script src="./js/painel.js"></script>

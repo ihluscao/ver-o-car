@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feirão Ver-o-Car</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚘</text></svg>">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    
+    <style>
+        /* 🟢 1. IDENTIDADE VISUAL VER-O-CAR (Tema Premium) */
+        :root {
+            /* Fundo principal (Asfalto escuro) */
+            --pico-background-color: #0b0c10;
+            
+            /* Fundo dos cartões (Cinza chumbo elegante) */
+            --pico-card-background-color: #1f2833;
+            
+            /* Cor dos botões primários e destaques (Vermelho Esportivo) */
+            --pico-primary: #e63946;
+            --pico-primary-background: #e63946;
+            --pico-primary-hover: #d62828;
+            --pico-primary-hover-background: #d62828;
+            --pico-primary-focus: rgba(230, 57, 70, 0.3);
+
+            /* Cor dos textos e preços */
+            --pico-color: #c5c6c7;
+            --pico-h1-color: #ffffff;
+            --pico-h2-color: #ffffff;
+            --pico-mark-background-color: #e63946; /* Fundo do preço em vermelho */
+            --pico-mark-color: #ffffff; /* Letra do preço em branco */
+        }
+        /* 🟢 2. Estilos do Carrossel de Destaques */
+        .carrossel {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto; /* Mantém a rolagem, mas ocultaremos a barra a seguir */
+            scroll-snap-type: x mandatory;
+            margin-bottom: 2rem;
+            scroll-behavior: smooth; /* Faz o deslize do Javascript ser suave */
+            
+            /* Ocultando a barra de rolagem no IE, Edge e Firefox */
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
+        }
+        
+        /* Ocultando a barra de rolagem no Chrome, Safari e Opera */
+        .carrossel::-webkit-scrollbar {
+            display: none; 
+        }
+
+        .destaque-card {
+            scroll-snap-align: center;
+            flex: 0 0 100%; 
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            height: 350px;
+        }
+
+        .destaque-card {
+            scroll-snap-align: center;
+            flex: 0 0 100%; /* Ocupa 100% da largura do contêiner */
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            height: 350px;
+        }
+
+        .destaque-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.5); /* Escurece a foto para o texto aparecer bem */
+        }
+
+        .destaque-info {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        /* 🟢 3. Regra exata para 5 colunas em monitores grandes */
+        #catalogo-carros .grid {
+            display: grid;
+            gap: 1.5rem; 
+            /* Padrão para celular: 1 coluna */
+            grid-template-columns: 1fr;
+        }
+
+        /* Em telas de computador (acima de 1024px de largura): 5 colunas exatas! */
+        @media (min-width: 1024px) {
+            #catalogo-carros .grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        #catalogo-carros article {
+            padding: 1rem; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        #catalogo-carros header strong { font-size: 0.9rem; }
+        #catalogo-carros p { font-size: 0.85rem; margin-bottom: 0.5rem; }
+        
+        /* 🟢 4. Estilo para os botões de paginação */
+        .paginacao {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            align-items: center;
+        }
+        .paginacao button { width: auto; padding: 0.5rem 1rem; }
+        .carrossel-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    /* NOVO: Estilo das setas flutuantes */
+    .seta-carrossel {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 10; /* Fica por cima da foto */
+        padding: 0;
+    }
+
+    .seta-carrossel:hover { background-color: rgba(0, 0, 0, 0.9); }
+    .seta-carrossel.esquerda { left: 10px; }
+    .seta-carrossel.direita { right: 10px; }
+    </style>
+    <section id="area-destaques" style="display: none;">
+    <h2 style="margin-top: 1rem;">🔥 Destaques da Semana</h2>
+    
+    <div class="carrossel-wrapper">
+        <button class="seta-carrossel esquerda" onclick="moverCarrosselManual(-1)">&#10094;</button>
+        
+        <div class="carrossel" id="carrossel-container">
+            </div>
+        
+        <button class="seta-carrossel direita" onclick="moverCarrosselManual(1)">&#10095;</button>
+    </div>
+</section>
+</head>
+<body>
+    <main class="container">
+        
+        <nav>
+            <ul>
+                <li><strong>🚗 Ver-o-Car</strong></li>
+            </ul>
+            <ul>
+                <li><a href="index.html" class="secondary">Acesso Interno</a></li>
+            </ul>
+        </nav>
+
+        <section id="area-destaques" style="display: none;">
+            <h2 style="margin-top: 1rem;">🔥 Destaques da Semana</h2>
+            <div class="carrossel" id="carrossel-container">
+                </div>
+        </section>
+
+        <section id="hero">
+            <h2 style="margin-top: 1rem;">O maior mercado automotivo digital.</h2>
+            <p>Confira nossos veículos disponíveis com os melhores preços.</p>
+        </section>
+
+        <hr>
+
+        <section>
+            <p id="mensagem-carregamento" aria-busy="true">Buscando o estoque no servidor...</p>
+            <div id="catalogo-carros"></div>
+            
+            <div class="paginacao" id="controles-paginacao"></div>
+        </section>
+
+    </main>
+
+    <script src="./js/vitrine.js"></script>
+</body>
+</html>

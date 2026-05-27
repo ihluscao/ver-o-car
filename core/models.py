@@ -22,6 +22,7 @@ class Veiculo(models.Model):
     chassi = models.CharField(max_length=17, unique=True)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='DISPONIVEL')
+    imagem = models.ImageField(upload_to='carros/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.marca} {self.modelo} ({self.ano})"
@@ -30,7 +31,6 @@ class Venda(models.Model):
     veiculo = models.OneToOneField(Veiculo, on_delete=models.PROTECT) 
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     vendedor = models.ForeignKey(User, on_delete=models.PROTECT)
-    
     data_venda = models.DateTimeField(auto_now_add=True)
     valor_final = models.DecimalField(max_digits=10, decimal_places=2)
     forma_pagamento = models.CharField(max_length=50)
